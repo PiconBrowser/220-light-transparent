@@ -1,0 +1,48 @@
+name: Update Picons
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-picons
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y --no-install-recommends --no-install-suggests git xz-utils binutils pngquant imagemagick librsvg2-bin jq
+
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+
+      - name: Checkout picons logos
+        uses: actions/checkout@v4
+        with:
+          repository: picons/picons
+          sparse-checkout: build-source
+          path: picons-source
+
+      - name: Sync build-source
+        run: rsync -a --delete picons-source/build-source/ build-source/
+
+      - name: Build picons
+        run: bash 2-build-picons.sh 220 light transparent
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add build-source/ pngs/
+          git diff --staged --quiet || git commit -m "Update picons"
+          git push
