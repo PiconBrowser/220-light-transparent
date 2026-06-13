@@ -143,7 +143,12 @@ echo "$logocollection" | while read logoname ; do
 
         convert $location/build-source/backgrounds/$resolution/$background.png \( $logo -background none -bordercolor none -border 100 -trim -border 1% -resize $resize -gravity center -extent $resolution +repage \) -layers merge - 2>> $logfile | $pngquant - 2>> $logfile > $pngs/$logoname.png
     done
-done
+
+######################################
+## Generate mapping file            ##
+######################################
+echo "$(date +'%H:%M:%S') - EXECUTING: Generating mapping file"
+grep -v -e '^#' -e '^$' "$location/build-source/$style.index" | awk -F= '$1 != $2' > "$location/mapping.txt"
 
 ######################################
 ## Generate MD5 hash file           ##

@@ -36,6 +36,13 @@ jobs:
       - name: Sync build-source
         run: rsync -a --delete picons-source/build-source/ build-source/
 
+      - name: Remove outdated pngs
+        run: |
+          git diff --name-only HEAD -- build-source/logos/ \
+            | sed 's|build-source/logos/||; s/\.\(default\|light\|dark\|white\)\.\(png\|svg\)$//' \
+            | sort -u \
+            | xargs -r -I{} rm -f "pngs/{}.png"
+
       - name: Build picons
         run: bash 2-build-picons.sh 220x132 190x102 light transparent
 
