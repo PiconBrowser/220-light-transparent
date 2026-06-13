@@ -26,7 +26,19 @@ jobs:
       - name: Checkout this repo
         uses: actions/checkout@v4
 
-      - name: Checkout picons logos
+      - name: Restore pngs from gh-pages
+        run: |
+          mkdir -p pngs info
+          if git ls-remote --exit-code origin gh-pages; then
+            git clone --depth 1 --branch gh-pages \
+              https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} \
+              _gh-pages
+            find _gh-pages -maxdepth 1 -name "*.png" -exec cp {} pngs/ \;
+            [ -d _gh-pages/info ] && cp -r _gh-pages/info/. info/ || true
+            rm -rf _gh-pages
+          fi
+
+      - name: Checkout picons source
         uses: actions/checkout@v4
         with:
           repository: picons/picons
@@ -56,9 +68,9 @@ jobs:
 
       - name: Prepare GitHub Pages content
         run: |
-          mkdir -p pages
-          cp -r pngs/. pages/
-          cp -r info/ pages/info/
+          mkdir -p pages/info
+          cp pngs/*.png pages/
+          cp info/files.md5 info/files.map pages/info/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
