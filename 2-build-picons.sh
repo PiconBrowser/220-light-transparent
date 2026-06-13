@@ -72,7 +72,8 @@ style=utf8snp
 ## Prepare output folder    ##
 ##############################
 pngs=$location/pngs
-mkdir -p $pngs
+info=$location/info
+mkdir -p $pngs $info
 
 #############################################
 ## Some basic checking of the source files ##
@@ -148,13 +149,13 @@ echo "$logocollection" | while read logoname ; do
 ## Generate mapping file            ##
 ######################################
 echo "$(date +'%H:%M:%S') - EXECUTING: Generating mapping file"
-grep -v -e '^#' -e '^$' "$location/build-source/$style.index" | awk -F= '$1 != $2' > "$location/mapping.txt"
+grep -v -e '^#' -e '^$' "$location/build-source/$style.index" | awk -F= '$1 != $2' > "$info/files.map"
 
 ######################################
 ## Generate MD5 hash file           ##
 ######################################
 echo "$(date +'%H:%M:%S') - EXECUTING: Generating MD5 hashes"
-find "$pngs" -maxdepth 1 -name "*.png" | sort | xargs md5sum > "$pngs/MD5SUMS"
+find "$pngs" -maxdepth 1 -name "*.png" | sort | xargs md5sum > "$info/files.md5"
 
 ######################################
 ## Cleanup temporary files and exit ##
