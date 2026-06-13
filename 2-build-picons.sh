@@ -59,9 +59,10 @@ fi
 
 ##############################################
 ## Parameters:                             ##
-##   $1  resolution prefix (e.g. 220)      ##
-##   $2  type     (e.g. light)             ##
-##   $3  background (e.g. transparent)     ##
+##   $1  resolution (e.g. 220x132)         ##
+##   $2  resize     (e.g. 190x102)         ##
+##   $3  type       (e.g. light)           ##
+##   $4  background (e.g. transparent)     ##
 ##############################################
 
 style=utf8snp
@@ -91,30 +92,12 @@ logocollection=$(grep -v -e '^#' -e '^$' "$location/build-source/$style.index" |
 logocount=$(echo "$logocollection" | wc -l)
 mkdir -p $temp/cache
 
-if [[ -f $location/build-input/backgrounds.conf ]]; then
-    backgroundsconf=$location/build-input/backgrounds.conf
-else
-    echo "$(date +'%H:%M:%S') - WARNING: No \"backgrounds.conf\" file found in \"build-input\", using default file!"
-    backgroundsconf=$location/build-source/config/backgrounds.conf
-fi
+resolution=$1
+resize=$2
+type=$3
+background=$4
 
-grep -v -e '^#' -e '^$' $backgroundsconf | while read lines ; do
-    currentlogo=""
-
-    OLDIFS=$IFS
-    IFS=";"
-    line=($lines)
-    IFS=$OLDIFS
-
-    resolution=${line[0]}
-    resize=${line[1]}
-    type=${line[2]}
-    background=${line[3]}
-    [[ -n $1 ]] && [[ "$resolution" != $1* ]] && continue
-    [[ -n $2 ]] && [[ "$type" != "$2" ]] && continue
-    [[ -n $3 ]] && [[ "$background" != "$3" ]] && continue
-
-    echo "$logocollection" | while read logoname ; do
+echo "$logocollection" | while read logoname ; do
         ((currentlogo++))
         if [[ $- == *i* ]]; then
             echo -ne "           Converting logo: $currentlogo/$logocount"\\r

@@ -37,7 +37,7 @@ jobs:
         run: rsync -a --delete picons-source/build-source/ build-source/
 
       - name: Build picons
-        run: bash 2-build-picons.sh 220 light transparent
+        run: bash 2-build-picons.sh 220x132 190x102 light transparent
 
       - name: Commit and push
         run: |
